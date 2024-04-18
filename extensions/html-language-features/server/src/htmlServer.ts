@@ -7,7 +7,7 @@ import {
 	Connection, TextDocuments, InitializeParams, InitializeResult, RequestType,
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
-	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit
+	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit, DocumentOnTypeFormattingOptions
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -192,6 +192,10 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 			diagnosticsSupport = registerDiagnosticsPullSupport(documents, connection, runtime, validateTextDocument);
 		}
 
+		let documentOnTypeFormattingProvider: DocumentOnTypeFormattingOptions | undefined = { firstTriggerCharacter: '=', moreTriggerCharacter: ['>', '\\', '/'] };
+		if (initializationOptions?.provideFormatter === false) {
+			documentOnTypeFormattingProvider = undefined;
+		}
 		const capabilities: ServerCapabilities = {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			completionProvider: clientSnippetSupport ? { resolveProvider: true, triggerCharacters: ['.', ':', '<', '"', '=', '/'] } : undefined,
@@ -199,6 +203,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 			documentHighlightProvider: true,
 			documentRangeFormattingProvider: initializationOptions?.provideFormatter === true,
 			documentFormattingProvider: initializationOptions?.provideFormatter === true,
+			documentOnTypeFormattingProvider: documentOnTypeFormattingProvider,
 			documentLinkProvider: { resolveProvider: false },
 			documentSymbolProvider: true,
 			definitionProvider: true,
@@ -422,6 +427,31 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 
 	connection.onDocumentFormatting((formatParams, token) => {
 		return runSafe(runtime, () => onFormat(formatParams.textDocument, undefined, formatParams.options), [], `Error while formatting ${formatParams.textDocument.uri}`, token);
+	});
+
+	connection.onDocumentOnTypeFormatting((params, token) => {
+		return runSafe(runtime, async () => {
+			const document = documents.get(params.textDocument.uri);
+			if (document) {
+				const pos = params.position;
+				if (pos.character > 0) {
+					const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
+					if (mode && mode.doAutoInsert) {
+						let result;
+						if (params.ch === '=') {
+							result = await mode.doAutoInsert(document, pos, 'autoQuote');
+						} else {
+							result = await mode.doAutoInsert(document, pos, 'autoClose');
+						}
+						if (result !== null) {
+							return [TextEdit.insert(pos, result)];
+						}
+
+					}
+				}
+			}
+			return null;
+		}, null, `Error while computing auto insert actions for ${params.textDocument.uri}`, token);
 	});
 
 	connection.onDocumentLinks((documentLinkParam, token) => {
