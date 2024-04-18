@@ -445,7 +445,8 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 						}
 						if (result !== null) {
 							if (result.startsWith("$0") && result.length > 2) {
-								return [TextEdit.insert(pos, result.slice(2)), TextEdit.insert(pos, "")]
+								const deletedChar = Range.create(pos, Position.create(pos.line, pos.character + 1));
+								return [TextEdit.insert(pos, result.slice(1)), TextEdit.del(deletedChar)]
 							}
 							return [TextEdit.insert(pos, result)];
 						}
