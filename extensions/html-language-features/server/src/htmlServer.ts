@@ -444,6 +444,9 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 							result = await mode.doAutoInsert(document, pos, 'autoClose');
 						}
 						if (result !== null) {
+							if (result.startsWith("$0") && result.length > 2) {
+								return [TextEdit.insert(pos, result.slice(2)), TextEdit.insert(pos, "")]
+							}
 							return [TextEdit.insert(pos, result)];
 						}
 
