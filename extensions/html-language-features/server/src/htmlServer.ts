@@ -323,9 +323,13 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 							console.error("G");
 							let result: string | null = null;
 							if (change.text === '=') {
+								console.error("autoQuote");
 								result = await mode.doAutoInsert(document, pos.start, 'autoQuote');
-							} else if (change.text == '>') {
+							} else if (change.text === '>') {
+								console.error("autoClose");
 								result = await mode.doAutoInsert(document, pos.start, 'autoClose');
+							} else {
+								console.error("Not good");
 							}
 
 							if (result !== null) {
