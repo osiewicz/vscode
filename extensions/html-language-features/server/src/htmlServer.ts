@@ -7,7 +7,7 @@ import {
 	Connection, TextDocuments, InitializeParams, InitializeResult, RequestType,
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
-	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit, DocumentOnTypeFormattingOptions
+	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit, DocumentOnTypeFormattingOptions, TextDocumentContentChangeEvent, ApplyWorkspaceEditRequest, ApplyWorkspaceEditParams, TextDocumentEdit, SnippetTextEdit, StringValue
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -301,6 +301,45 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		return [];
 	}
 
+	connection.onDidChangeTextDocument(async (params) => {
+
+		const document = documents.get(params.textDocument.uri);
+		if (document) {
+			for (const change of params.contentChanges) {
+				if (TextDocumentContentChangeEvent.isIncremental(change)) {
+					const pos = change.range;
+					if (pos.end.line !== pos.start.line || pos.end.character != pos.start.character + 1) {
+						continue;
+					}
+					if (pos.start.character > 0) {
+						const mode = languageModes.getModeAtPosition(document, Position.create(pos.start.line, pos.start.character - 1));
+						if (mode && mode.doAutoInsert) {
+							let result: string | null = null;
+							if (change.text === '=') {
+								result = await mode.doAutoInsert(document, pos.start, 'autoQuote');
+							} else if (change.text == '>') {
+								result = await mode.doAutoInsert(document, pos.start, 'autoClose');
+							}
+							if (result !== null) {
+								let snippet: SnippetTextEdit = { range: pos, snippet: StringValue.createSnippet(result), annotationId: undefined };
+								const params: ApplyWorkspaceEditParams = {
+									edit: {
+										documentChanges: [TextDocumentEdit.create(document, [snippet])]
+									},
+									label: undefined
+								};
+								await connection.client.connection.sendRequest(ApplyWorkspaceEditRequest.type, params);
+							}
+
+						}
+					}
+				}
+
+			}
+
+		}
+	}
+	);
 	connection.onCompletion(async (textDocumentPosition, token) => {
 		return runSafe(runtime, async () => {
 			const document = documents.get(textDocumentPosition.textDocument.uri);
