@@ -308,7 +308,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 			for (const change of params.contentChanges) {
 				if (TextDocumentContentChangeEvent.isIncremental(change)) {
 					const pos = change.range;
-					if (pos.end.line !== pos.start.line || pos.end.character != pos.start.character + 1) {
+					if (pos.end.line !== pos.start.line || pos.end.character != pos.start.character) {
 						continue;
 					}
 					if (pos.start.character > 0) {
