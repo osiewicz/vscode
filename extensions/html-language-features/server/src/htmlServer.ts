@@ -327,6 +327,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 								result = await mode.doAutoInsert(document, pos.start, 'autoQuote');
 							} else if (change.text === '>') {
 								console.error("autoClose");
+								console.error(pos.start);
 								result = await mode.doAutoInsert(document, pos.start, 'autoClose');
 							} else {
 								console.error("Not good");
