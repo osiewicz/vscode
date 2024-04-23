@@ -304,23 +304,16 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 	connection.onDidChangeTextDocument(async (params) => {
 		await runSafe(runtime, async () => {
 			const document = documents.get(params.textDocument.uri);
-			console.error("A");
 			if (document) {
-				console.error("B");
 				for (const change of params.contentChanges) {
-					console.error("C");
 					if (TextDocumentContentChangeEvent.isIncremental(change)) {
-						console.error("D");
 						const pos = change.range;
 						if (pos.end.line !== pos.start.line || pos.end.character != pos.start.character) {
 							continue;
 						}
-						console.error("E");
 						if (pos.start.character > 0) {
-							console.error("F");
 							const mode = languageModes.getModeAtPosition(document, pos.start);
 							if (mode && mode.doAutoInsert) {
-								console.error("G");
 								let result: string | null = null;
 								const next = Position.create(pos.start.line, pos.start.character + 1);
 								if (change.text === '=') {
@@ -483,34 +476,34 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		return runSafe(runtime, () => onFormat(formatParams.textDocument, undefined, formatParams.options), [], `Error while formatting ${formatParams.textDocument.uri}`, token);
 	});
 
-	connection.onDocumentOnTypeFormatting((params, token) => {
-		return runSafe(runtime, async () => {
-			const document = documents.get(params.textDocument.uri);
-			if (document) {
-				const pos = params.position;
-				if (pos.character > 0) {
-					const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
-					if (mode && mode.doAutoInsert) {
-						let result;
-						if (params.ch === '=') {
-							result = await mode.doAutoInsert(document, pos, 'autoQuote');
-						} else {
-							result = await mode.doAutoInsert(document, pos, 'autoClose');
-						}
-						if (result !== null) {
-							if (result.startsWith("$0") && result.length > 2) {
-								const deletedChar = Range.create(pos, Position.create(pos.line, pos.character + 1));
-								return [TextEdit.insert(pos, result.slice(1)), TextEdit.del(deletedChar)]
-							}
-							return [TextEdit.insert(pos, result)];
-						}
+	// connection.onDocumentOnTypeFormatting((params, token) => {
+	// 	return runSafe(runtime, async () => {
+	// 		const document = documents.get(params.textDocument.uri);
+	// 		if (document) {
+	// 			const pos = params.position;
+	// 			if (pos.character > 0) {
+	// 				const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
+	// 				if (mode && mode.doAutoInsert) {
+	// 					let result;
+	// 					if (params.ch === '=') {
+	// 						result = await mode.doAutoInsert(document, pos, 'autoQuote');
+	// 					} else {
+	// 						result = await mode.doAutoInsert(document, pos, 'autoClose');
+	// 					}
+	// 					if (result !== null) {
+	// 						if (result.startsWith("$0") && result.length > 2) {
+	// 							const deletedChar = Range.create(pos, Position.create(pos.line, pos.character + 1));
+	// 							return [TextEdit.insert(pos, result.slice(1)), TextEdit.del(deletedChar)]
+	// 						}
+	// 						return [TextEdit.insert(pos, result)];
+	// 					}
 
-					}
-				}
-			}
-			return null;
-		}, null, `Error while computing auto insert actions for ${params.textDocument.uri}`, token);
-	});
+	// 				}
+	// 			}
+	// 		}
+	// 		return null;
+	// 	}, null, `Error while computing auto insert actions for ${params.textDocument.uri}`, token);
+	// });
 
 	connection.onDocumentLinks((documentLinkParam, token) => {
 		return runSafe(runtime, async () => {
