@@ -301,53 +301,53 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		return [];
 	}
 
-	connection.onDidChangeTextDocument(async (params) => {
-		await runSafe(runtime, async () => {
-			const document = documents.get(params.textDocument.uri);
-			if (document) {
-				for (const change of params.contentChanges) {
-					if (TextDocumentContentChangeEvent.isIncremental(change)) {
-						const pos = change.range;
-						if (pos.end.line !== pos.start.line || pos.end.character != pos.start.character) {
-							continue;
-						}
-						if (pos.start.character > 0) {
-							const mode = languageModes.getModeAtPosition(document, pos.start);
-							if (mode && mode.doAutoInsert) {
-								let result: string | null = null;
-								const next = Position.create(pos.start.line, pos.start.character + 1);
-								if (change.text === '=') {
-									console.error("autoQuote");
-									result = await mode.doAutoInsert(document, next, 'autoQuote');
-								} else if (change.text === '>') {
-									console.error("autoClose");
-									console.error(pos.start);
-									result = await mode.doAutoInsert(document, next, 'autoClose');
-								}
+	// documents.onDidChangeContent(async (params) => {
+	// 	await runSafe(runtime, async () => {
+	// 		const document = documents.get(params.document.uri);
+	// 		if (document && params.document.version === document.version) {
 
-								if (result !== null) {
-									console.error("H");
-									let snippet: SnippetTextEdit = { range: Range.create(next, next), snippet: StringValue.createSnippet(result), annotationId: undefined };
-									const params: ApplyWorkspaceEditParams = {
-										edit: {
-											documentChanges: [TextDocumentEdit.create(document, [snippet])]
-										},
-										label: undefined
-									};
-									await connection.client.connection.sendRequest(ApplyWorkspaceEditRequest.type, params);
-								}
+	// 			for (const change of params.document.) {
+	// 				if (TextDocumentContentChangeEvent.isIncremental(change)) {
+	// 					const pos = change.range;
+	// 					if (pos.end.line !== pos.start.line || pos.end.character != pos.start.character) {
+	// 						continue;
+	// 					}
+	// 					if (pos.start.character > 0) {
+	// 						const mode = languageModes.getModeAtPosition(document, pos.start);
+	// 						if (mode && mode.doAutoInsert) {
+	// 							let result: string | null = null;
+	// 							const next = Position.create(pos.start.line, pos.start.character + 1);
+	// 							if (change.text === '=') {
+	// 								console.error("autoQuote");
+	// 								result = await mode.doAutoInsert(document, next, 'autoQuote');
+	// 							} else if (change.text === '>') {
+	// 								console.error("autoClose");
+	// 								console.error(pos.start);
+	// 								result = await mode.doAutoInsert(document, next, 'autoClose');
+	// 							}
 
-							}
-						}
-					}
+	// 							if (result !== null) {
+	// 								console.error("H");
+	// 								let snippet: SnippetTextEdit = { range: Range.create(next, next), snippet: StringValue.createSnippet(result), annotationId: undefined };
+	// 								const params: ApplyWorkspaceEditParams = {
+	// 									edit: {
+	// 										documentChanges: [TextDocumentEdit.create(document, [snippet])]
+	// 									},
+	// 									label: undefined
+	// 								};
+	// 								await connection.client.connection.sendRequest(ApplyWorkspaceEditRequest.type, params);
+	// 							}
 
-				}
+	// 						}
+	// 					}
+	// 				}
 
-			}
-			return;
-		}, null, `Error while updating stuff`, CancellationToken.None);
-	}
-	);
+	// 			}
+
+	// 		}
+	// 		return;
+	// 	}, null, `Error while updating stuff`, CancellationToken.None);
+	// })
 	connection.onCompletion(async (textDocumentPosition, token) => {
 		return runSafe(runtime, async () => {
 			const document = documents.get(textDocumentPosition.textDocument.uri);
@@ -476,34 +476,42 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		return runSafe(runtime, () => onFormat(formatParams.textDocument, undefined, formatParams.options), [], `Error while formatting ${formatParams.textDocument.uri}`, token);
 	});
 
-	// connection.onDocumentOnTypeFormatting((params, token) => {
-	// 	return runSafe(runtime, async () => {
-	// 		const document = documents.get(params.textDocument.uri);
-	// 		if (document) {
-	// 			const pos = params.position;
-	// 			if (pos.character > 0) {
-	// 				const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
-	// 				if (mode && mode.doAutoInsert) {
-	// 					let result;
-	// 					if (params.ch === '=') {
-	// 						result = await mode.doAutoInsert(document, pos, 'autoQuote');
-	// 					} else {
-	// 						result = await mode.doAutoInsert(document, pos, 'autoClose');
-	// 					}
-	// 					if (result !== null) {
-	// 						if (result.startsWith("$0") && result.length > 2) {
-	// 							const deletedChar = Range.create(pos, Position.create(pos.line, pos.character + 1));
-	// 							return [TextEdit.insert(pos, result.slice(1)), TextEdit.del(deletedChar)]
-	// 						}
-	// 						return [TextEdit.insert(pos, result)];
-	// 					}
+	connection.onDocumentOnTypeFormatting((params, token) => {
+		return runSafe(runtime, async () => {
+			const document = documents.get(params.textDocument.uri);
+			if (document) {
+				const pos = params.position;
+				if (pos.character > 0) {
+					const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
+					if (mode && mode.doAutoInsert) {
+						let result;
+						if (params.ch === '=') {
+							result = await mode.doAutoInsert(document, pos, 'autoQuote');
+						} else {
+							result = await mode.doAutoInsert(document, pos, 'autoClose');
+						}
+						if (result !== null) {
 
-	// 				}
-	// 			}
-	// 		}
-	// 		return null;
-	// 	}, null, `Error while computing auto insert actions for ${params.textDocument.uri}`, token);
-	// });
+
+							console.error("H");
+							let snippet: SnippetTextEdit = { range: Range.create(pos, pos), snippet: StringValue.createSnippet(result), annotationId: undefined };
+							const params: ApplyWorkspaceEditParams = {
+								edit: {
+									documentChanges: [TextDocumentEdit.create(document, [snippet])]
+								},
+								label: undefined
+							};
+							await connection.client.connection.sendRequest(ApplyWorkspaceEditRequest.type, params);
+
+							return [];
+						}
+
+					}
+				}
+			}
+			return null;
+		}, null, `Error while computing auto insert actions for ${params.textDocument.uri}`, token);
+	});
 
 	connection.onDocumentLinks((documentLinkParam, token) => {
 		return runSafe(runtime, async () => {
