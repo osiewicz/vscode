@@ -318,24 +318,25 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 					console.error("E");
 					if (pos.start.character > 0) {
 						console.error("F");
-						const mode = languageModes.getModeAtPosition(document, Position.create(pos.start.line, pos.start.character - 1));
+						const mode = languageModes.getModeAtPosition(document, pos.start);
 						if (mode && mode.doAutoInsert) {
 							console.error("G");
 							let result: string | null = null;
+							const next = Position.create(pos.start.line, pos.start.character + 1);
 							if (change.text === '=') {
 								console.error("autoQuote");
-								result = await mode.doAutoInsert(document, pos.start, 'autoQuote');
+								result = await mode.doAutoInsert(document, next, 'autoQuote');
 							} else if (change.text === '>') {
 								console.error("autoClose");
 								console.error(pos.start);
-								result = await mode.doAutoInsert(document, pos.start, 'autoClose');
+								result = await mode.doAutoInsert(document, next, 'autoClose');
 							} else {
 								console.error("Not good");
 							}
 
 							if (result !== null) {
 								console.error("H");
-								let snippet: SnippetTextEdit = { range: pos, snippet: StringValue.createSnippet(result), annotationId: undefined };
+								let snippet: SnippetTextEdit = { range: Range.create(next, next), snippet: StringValue.createSnippet(result), annotationId: undefined };
 								const params: ApplyWorkspaceEditParams = {
 									edit: {
 										documentChanges: [TextDocumentEdit.create(document, [snippet])]
