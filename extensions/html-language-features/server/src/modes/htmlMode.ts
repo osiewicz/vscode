@@ -67,8 +67,8 @@ export function getHTMLMode(htmlLanguageService: HTMLLanguageService, workspace:
 					return htmlLanguageService.doQuoteComplete(document, position, htmlDocuments.get(document), options);
 				}
 			} else if (kind === 'autoClose') {
-				console.error(offset);
-				console.error(text.charAt(offset - 1));
+				console.error(JSON.stringify(offset));
+				console.error(JSON.stringify(text.charAt(offset - 1)));
 				if (offset > 0 && text.charAt(offset - 1).match(/[>\/]/g)) {
 					return htmlLanguageService.doTagComplete(document, position, htmlDocuments.get(document));
 				}
