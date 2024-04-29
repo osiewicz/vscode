@@ -7,7 +7,7 @@ import {
 	Connection, TextDocuments, InitializeParams, InitializeResult, RequestType,
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
-	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit, DocumentOnTypeFormattingOptions, TextDocumentContentChangeEvent, ApplyWorkspaceEditRequest, ApplyWorkspaceEditParams, TextDocumentEdit, SnippetTextEdit, StringValue, CancellationToken
+	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit, DocumentOnTypeFormattingOptions, ApplyWorkspaceEditRequest, ApplyWorkspaceEditParams, TextDocumentEdit, SnippetTextEdit, StringValue
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
