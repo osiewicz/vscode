@@ -490,6 +490,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 						} else {
 							result = await mode.doAutoInsert(document, pos, 'autoClose');
 						}
+						console.error("G");
 						if (result !== null) {
 
 
