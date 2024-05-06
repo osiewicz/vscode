@@ -8,7 +8,8 @@ import {
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
 	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit,
-	ApplyWorkspaceEditRequest
+	ApplyWorkspaceEditRequest, ApplyWorkspaceEditParams,
+	WorkspaceEdit
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -262,7 +263,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 						} else {
 							console.error("o is null :(");
 						}
-
+						connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [] } });
 						return [];
 					}
 				}
@@ -515,7 +516,6 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		}, [], `Error while computing color presentations for ${params.textDocument.uri}`, token);
 	});
 
-	ApplyWorkspaceEditRequest
 	connection.onRequest(AutoInsertRequest.type, (params, token) => {
 		return runSafe(runtime, async () => {
 			const document = documents.get(params.textDocument.uri);
