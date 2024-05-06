@@ -256,7 +256,8 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 						if (documentFormattingParams.ch === '=') {
 							typ = 'autoQuote';
 						}
-						console.error(JSON.stringify(await mode.doAutoInsert(document, pos, typ)));
+						const o = await mode.doAutoInsert(document, pos, typ);
+						console.error(JSON.stringify(o));
 						return [];
 					}
 				}
