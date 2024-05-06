@@ -252,7 +252,11 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				if (pos.character > 0) {
 					const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
 					if (mode && mode.doAutoInsert) {
-						console.error(JSON.stringify(mode.doAutoInsert(document, pos, 'autoClose')));
+						let typ: 'autoClose' | 'autoQuote' = 'autoClose';
+						if (documentFormattingParams.ch === '=') {
+							typ = 'autoQuote';
+						}
+						console.error(JSON.stringify(await mode.doAutoInsert(document, pos, typ)));
 						return [];
 					}
 				}
