@@ -8,8 +8,10 @@ import {
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
 	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit,
-	ApplyWorkspaceEditRequest, ApplyWorkspaceEditParams,
-	WorkspaceEdit
+	ApplyWorkspaceEditRequest,
+	TextDocumentEdit,
+	SnippetTextEdit,
+	StringValue,
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -28,6 +30,7 @@ import { fetchHTMLDataProviders } from './customData';
 import { getSelectionRanges } from './modes/selectionRanges';
 import { SemanticTokenProvider, newSemanticTokenProvider } from './modes/semanticTokens';
 import { FileSystemProvider, getFileSystemProvider } from './requests';
+import { OptionalVersionedTextDocumentIdentifier } from 'vscode-languageserver-types';
 
 namespace CustomDataChangedNotification {
 	export const type: NotificationType<string[]> = new NotificationType('html/customDataChanged');
@@ -258,12 +261,10 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 							typ = 'autoQuote';
 						}
 						const o = await mode.doAutoInsert(document, pos, typ);
-						if (typeof o === "string") {
-							console.error(JSON.stringify(o));
-						} else {
-							console.error("o is null :(");
+						if (typeof o !== "string") {
+							return [];
 						}
-						connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [] } });
+						await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
 						return [];
 					}
 				}
