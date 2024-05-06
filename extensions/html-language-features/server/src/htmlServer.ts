@@ -10,7 +10,6 @@ import {
 	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit,
 	ApplyWorkspaceEditRequest,
 	TextDocumentEdit,
-	SnippetTextEdit,
 	StringValue,
 } from 'vscode-languageserver';
 import {
