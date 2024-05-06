@@ -257,7 +257,12 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 							typ = 'autoQuote';
 						}
 						const o = await mode.doAutoInsert(document, pos, typ);
-						console.error(JSON.stringify(o));
+						if (typeof o === "string") {
+							console.error(JSON.stringify(o));
+						} else {
+							console.error("o is null :(");
+						}
+
 						return [];
 					}
 				}
