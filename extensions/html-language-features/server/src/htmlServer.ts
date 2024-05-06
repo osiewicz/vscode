@@ -7,7 +7,8 @@ import {
 	Connection, TextDocuments, InitializeParams, InitializeResult, RequestType,
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
-	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit
+	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit,
+	ApplyWorkspaceEditRequest
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -213,6 +214,10 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				documentSelector: null,
 				interFileDependencies: false,
 				workspaceDiagnostics: false
+			},
+			documentOnTypeFormattingProvider: {
+				firstTriggerCharacter: '>',
+				moreTriggerCharacter: ['=', '/']
 			}
 		};
 		return { capabilities };
@@ -237,6 +242,23 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				diagnosticsSupport?.requestRefresh();
 			});
 		}
+	});
+
+	connection.onDocumentOnTypeFormatting((documentFormattingParams, token) => {
+		return runSafe(runtime, async () => {
+			const document = documents.get(documentFormattingParams.textDocument.uri);
+			if (document) {
+				const pos = documentFormattingParams.position;
+				if (pos.character > 0) {
+					const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
+					if (mode && mode.doAutoInsert) {
+						console.error(JSON.stringify(mode.doAutoInsert(document, pos, 'autoClose')));
+						return [];
+					}
+				}
+			}
+			return [];
+		}, [], `Error while computing completions for ${documentFormattingParams.textDocument.uri}`, token);
 	});
 
 	let formatterRegistrations: Thenable<Disposable>[] | null = null;
@@ -483,6 +505,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		}, [], `Error while computing color presentations for ${params.textDocument.uri}`, token);
 	});
 
+	ApplyWorkspaceEditRequest
 	connection.onRequest(AutoInsertRequest.type, (params, token) => {
 		return runSafe(runtime, async () => {
 			const document = documents.get(params.textDocument.uri);
