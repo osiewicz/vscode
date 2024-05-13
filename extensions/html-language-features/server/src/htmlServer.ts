@@ -256,11 +256,12 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
 								if (mode && mode.doAutoInsert) {
 									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
-									if (edit.text === '=') {
-										typ = 'autoQuote';
-									} else if (edit.text !== '>' && edit.text !== '/') {
-										continue;
-									}
+									// if (edit.text === '=') {
+									// 	typ = 'autoQuote';
+									// } else if (edit.text !== '>' && edit.text !== '/') {
+									// 	continue;
+									// }
+									console.error("autoClosing");
 									const o = await mode.doAutoInsert(document, pos, typ);
 									if (typeof o !== "string") {
 										return;
