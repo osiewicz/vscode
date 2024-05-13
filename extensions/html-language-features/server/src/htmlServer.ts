@@ -246,28 +246,34 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		}
 		connection.onNotification(DidChangeTextDocumentNotification.type, async documentChange => {
 			await runSafe(runtime, async () => {
-				console.error("Handling notification");
+
 				const document = documents.get(documentChange.textDocument.uri);
+				console.log(documentChange.textDocument.version);
 				if (document) {
+					console.log(document.version);
+				}
+				if (document && document.version == documentChange.textDocument.version) {
 					for (const edit of documentChange.contentChanges) {
+
 						if (TextDocumentContentChangeEvent.isIncremental(edit)) {
+							console.error(`Position: ${edit.range.start.line} ${edit.range.start.character}`);
+							console.error(document.getText());
 							const pos = edit.range.start;
 							if (pos.character > 0) {
 								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
 								if (mode && mode.doAutoInsert) {
 									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
-									// if (edit.text === '=') {
-									// 	typ = 'autoQuote';
-									// } else if (edit.text !== '>' && edit.text !== '/') {
-									// 	continue;
-									// }
-									console.error("autoClosing");
+									if (edit.text === '=') {
+										typ = 'autoQuote';
+									} else if (edit.text !== '>' && edit.text !== '/') {
+										continue;
+									}
+									console.error(`autoClosing ${pos} at offset ${document.offsetAt(pos)} where text is \`${document.getText().charAt(document.offsetAt(pos))}\``);
 									const o = await mode.doAutoInsert(document, pos, typ);
 									if (typeof o !== "string") {
-										return;
+										continue;
 									}
 									await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
-									return;
 								}
 							}
 						}
