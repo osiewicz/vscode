@@ -11,6 +11,9 @@ import {
 	ApplyWorkspaceEditRequest,
 	TextDocumentEdit,
 	StringValue,
+	DidChangeTextDocumentNotification,
+	CancellationToken,
+	TextDocumentContentChangeEvent,
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -244,33 +247,42 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				workspaceFolders = updatedFolders.concat(toAdd);
 				diagnosticsSupport?.requestRefresh();
 			});
+			connection.onNotification(DidChangeTextDocumentNotification.type, async documentChange => {
+
+				const document = documents.get(documentChange.textDocument.uri);
+				if (document) {
+					for (const edit of documentChange.contentChanges) {
+						if (TextDocumentContentChangeEvent.isIncremental(edit)) {
+							const pos = edit.range.start;
+							if (pos.character > 0) {
+								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
+								if (mode && mode.doAutoInsert) {
+									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
+									if (edit.text === '=') {
+										typ = 'autoQuote';
+									} else if (edit.text !== '>' && edit.text !== '/') {
+										continue;
+									}
+									const o = await mode.doAutoInsert(document, pos, typ);
+									if (typeof o !== "string") {
+										return;
+									}
+									await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
+									return;
+								}
+							}
+						}
+
+					}
+
+				}
+				return;
+
+			})
 		}
 	});
 
-	connection.onDocumentOnTypeFormatting((documentFormattingParams, token) => {
-		return runSafe(runtime, async () => {
-			const document = documents.get(documentFormattingParams.textDocument.uri);
-			if (document) {
-				const pos = documentFormattingParams.position;
-				if (pos.character > 0) {
-					const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
-					if (mode && mode.doAutoInsert) {
-						let typ: 'autoClose' | 'autoQuote' = 'autoClose';
-						if (documentFormattingParams.ch === '=') {
-							typ = 'autoQuote';
-						}
-						const o = await mode.doAutoInsert(document, pos, typ);
-						if (typeof o !== "string") {
-							return [];
-						}
-						await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
-						return [];
-					}
-				}
-			}
-			return [];
-		}, [], `Error while computing completions for ${documentFormattingParams.textDocument.uri}`, token);
-	});
+
 
 	let formatterRegistrations: Thenable<Disposable>[] | null = null;
 
