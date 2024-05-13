@@ -12,7 +12,6 @@ import {
 	TextDocumentEdit,
 	StringValue,
 	DidChangeTextDocumentNotification,
-	CancellationToken,
 	TextDocumentContentChangeEvent,
 } from 'vscode-languageserver';
 import {
@@ -221,10 +220,6 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				interFileDependencies: false,
 				workspaceDiagnostics: false
 			},
-			documentOnTypeFormattingProvider: {
-				firstTriggerCharacter: '>',
-				moreTriggerCharacter: ['=', '/']
-			}
 		};
 		return { capabilities };
 	});
