@@ -13,6 +13,7 @@ import {
 	StringValue,
 	DidChangeTextDocumentNotification,
 	TextDocumentContentChangeEvent,
+	CancellationToken,
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -242,8 +243,10 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				workspaceFolders = updatedFolders.concat(toAdd);
 				diagnosticsSupport?.requestRefresh();
 			});
-			connection.onNotification(DidChangeTextDocumentNotification.type, async documentChange => {
-
+		}
+		connection.onNotification(DidChangeTextDocumentNotification.type, async documentChange => {
+			await runSafe(runtime, async () => {
+				console.error("Handling notification");
 				const document = documents.get(documentChange.textDocument.uri);
 				if (document) {
 					for (const edit of documentChange.contentChanges) {
@@ -273,8 +276,9 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				}
 				return;
 
-			})
-		}
+			}, undefined, "Error while handling notification", CancellationToken.None);
+		})
+
 	});
 
 
