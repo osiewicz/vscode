@@ -11,7 +11,6 @@ import {
 	ApplyWorkspaceEditRequest,
 	TextDocumentEdit,
 	StringValue,
-	DidChangeTextDocumentNotification,
 	TextDocumentContentChangeEvent,
 	CancellationToken,
 } from 'vscode-languageserver';
@@ -226,6 +225,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 	});
 
 	connection.onInitialized(() => {
+		console.error("Initialized");
 		if (workspaceFoldersSupport) {
 			connection.client.register(DidChangeWorkspaceFoldersNotification.type);
 
@@ -244,21 +244,16 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				diagnosticsSupport?.requestRefresh();
 			});
 		}
-		connection.onNotification(DidChangeTextDocumentNotification.type, async documentChange => {
+		documents.onDidChangeContent(async documentChange => {
 			await runSafe(runtime, async () => {
 
-				const document = documents.get(documentChange.textDocument.uri);
-				console.log(documentChange.textDocument.version);
-				if (document) {
-					console.log(document.version);
-				}
-				if (document && document.version == documentChange.textDocument.version) {
-					for (const edit of documentChange.contentChanges) {
+				const document = documentChange.document;
 
+				if (documentChange.changes) {
+					console.error(documentChange.changes.length.toString())
+					for (const edit of documentChange.changes) {
 						if (TextDocumentContentChangeEvent.isIncremental(edit)) {
-							console.error(`Position: ${edit.range.start.line} ${edit.range.start.character}`);
-							console.error(document.getText());
-							const pos = edit.range.start;
+							const pos: Position = { line: edit.range.start.line, character: edit.range.start.character + 1 };
 							if (pos.character > 0) {
 								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
 								if (mode && mode.doAutoInsert) {
@@ -268,7 +263,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 									} else if (edit.text !== '>' && edit.text !== '/') {
 										continue;
 									}
-									console.error(`autoClosing ${pos} at offset ${document.offsetAt(pos)} where text is \`${document.getText().charAt(document.offsetAt(pos))}\``);
+
 									const o = await mode.doAutoInsert(document, pos, typ);
 									if (typeof o !== "string") {
 										continue;
