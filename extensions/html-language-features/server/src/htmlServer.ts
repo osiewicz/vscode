@@ -257,6 +257,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 							if (pos.character > 0) {
 								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
 								if (mode && mode.doAutoInsert) {
+									console.error(`mode: ${mode.getId()}`);
 									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
 									if (edit.text === '=') {
 										typ = 'autoQuote';
