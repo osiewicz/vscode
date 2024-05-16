@@ -63,13 +63,10 @@ export function getHTMLMode(htmlLanguageService: HTMLLanguageService, workspace:
 					const htmlSettings = settings?.html;
 					const options = merge(htmlSettings?.suggest, {});
 					options.attributeDefaultValue = htmlSettings?.completion?.attributeDefaultValue ?? 'doublequotes';
-					console.error("doQuoteComplete");
 					return htmlLanguageService.doQuoteComplete(document, position, htmlDocuments.get(document), options);
 				}
 			} else if (kind === 'autoClose') {
-				console.error(text.charAt(offset - 1).toString());
 				if (offset > 0 && text.charAt(offset - 1).match(/[>\/]/g)) {
-					console.error("doTagComplete");
 					return htmlLanguageService.doTagComplete(document, position, htmlDocuments.get(document));
 				}
 			}

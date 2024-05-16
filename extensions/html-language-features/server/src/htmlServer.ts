@@ -225,7 +225,6 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 	});
 
 	connection.onInitialized(() => {
-		console.error("Initialized");
 		if (workspaceFoldersSupport) {
 			connection.client.register(DidChangeWorkspaceFoldersNotification.type);
 
@@ -250,14 +249,12 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				const document = documentChange.document;
 
 				if (documentChange.changes) {
-					console.error(documentChange.changes.length.toString())
 					for (const edit of documentChange.changes) {
 						if (TextDocumentContentChangeEvent.isIncremental(edit)) {
 							const pos: Position = { line: edit.range.start.line, character: edit.range.start.character + 1 };
 							if (pos.character > 0) {
 								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
 								if (mode && mode.doAutoInsert) {
-									console.error(`mode: ${mode.getId()}`);
 									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
 									if (edit.text === '=') {
 										typ = 'autoQuote';
