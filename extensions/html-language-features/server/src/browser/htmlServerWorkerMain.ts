@@ -24,7 +24,11 @@ const messageHandler = async (e: any) => {
 		}
 		await import('./htmlServerMain');
 		if (self.onmessage !== messageHandler) {
-			pendingMessages.forEach(msg => self.onmessage?.(msg));
+			pendingMessages.forEach(msg => {
+				if (self.onmessage) {
+					self.onmessage(msg)
+				}
+			});
 			pendingMessages.length = 0;
 		}
 		l10nLog.forEach(console.log);
