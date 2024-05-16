@@ -19,11 +19,6 @@
   resolved "https://registry.npmjs.org/@vscode/l10n/-/l10n-0.0.18.tgz"
   integrity sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==
 
-typescript@^5.2.2:
-  version "5.4.5"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-5.4.5.tgz"
-  integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==
-
 undici-types@~5.26.4:
   version "5.26.5"
   resolved "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz"
@@ -51,12 +46,12 @@ vscode-html-languageservice@^5.2.0:
 
 vscode-jsonrpc@9.0.0-next.2:
   version "9.0.0-next.2"
-  resolved "https://registry.npmjs.org/vscode-jsonrpc/-/vscode-jsonrpc-9.0.0-next.2.tgz"
+  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-9.0.0-next.2.tgz#29e9741c742c80329bba1c60ce38fd014651ba80"
   integrity sha512-meIaXAgChCHzWy45QGU8YpCNyqnZQ/sYeCj32OLDDbUYsCF7AvgpdXx3nnZn9yzr8ed0Od9bW+NGphEmXsqvIQ==
 
 vscode-languageserver-protocol@3.17.6-next.4:
   version "3.17.6-next.4"
-  resolved "https://registry.npmjs.org/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.6-next.4.tgz"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.6-next.4.tgz#3c56f6eb588bb42fccc0ac54a0d5daf2d02f0a1b"
   integrity sha512-/2bleKBxZLyRObS4mkpaWlVI9xGiUqMVmh/ztZ2vL4uP2XyIpraT45JBpn9AtXr0alqKJPKLuKr+/qcYULvm/w==
   dependencies:
     vscode-jsonrpc "9.0.0-next.2"
@@ -74,15 +69,13 @@ vscode-languageserver-types@3.17.5, vscode-languageserver-types@^3.17.5:
 
 vscode-languageserver-types@3.17.6-next.3:
   version "3.17.6-next.3"
-  resolved "https://registry.npmjs.org/vscode-languageserver-types/-/vscode-languageserver-types-3.17.6-next.3.tgz"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.17.6-next.3.tgz#f71d6c57f18d921346cfe0c227aabd72eb8cd2f0"
   integrity sha512-l5kNFXFRQGuzriXpuBqFpRmkf6f6A4VoU3h95OsVkqIOoi1k7KbwSo600cIdsKSJWrPg/+vX+QMPcMw1oI7ItA==
 
 "vscode-languageserver@https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes":
   version "10.0.0-next.3"
-  resolved "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes"
-  integrity sha512-HoNBeej4RtkCpcVbPmUe2bKsbQEIj+3T1EHzESrfzNTYBiaUZvrXAqc5nn2042cL9yUycP1J3ddv+F9YattYmQ==
+  resolved "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes#b874eb3c86a774f2ba4dde712c294b59a51224bc"
   dependencies:
-    typescript "^5.2.2"
     vscode-languageserver-protocol "3.17.6-next.4"
 
 vscode-uri@^3.0.8:
