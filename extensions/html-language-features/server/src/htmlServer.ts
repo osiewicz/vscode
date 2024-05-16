@@ -7,7 +7,12 @@ import {
 	Connection, TextDocuments, InitializeParams, InitializeResult, RequestType,
 	DocumentRangeFormattingRequest, Disposable, ServerCapabilities,
 	ConfigurationRequest, ConfigurationParams, DidChangeWorkspaceFoldersNotification,
-	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit
+	DocumentColorRequest, ColorPresentationRequest, TextDocumentSyncKind, NotificationType, RequestType0, DocumentFormattingRequest, FormattingOptions, TextEdit,
+	ApplyWorkspaceEditRequest,
+	TextDocumentEdit,
+	StringValue,
+	TextDocumentContentChangeEvent,
+	CancellationToken,
 } from 'vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
@@ -26,6 +31,7 @@ import { fetchHTMLDataProviders } from './customData';
 import { getSelectionRanges } from './modes/selectionRanges';
 import { SemanticTokenProvider, newSemanticTokenProvider } from './modes/semanticTokens';
 import { FileSystemProvider, getFileSystemProvider } from './requests';
+import { OptionalVersionedTextDocumentIdentifier } from 'vscode-languageserver-types';
 
 namespace CustomDataChangedNotification {
 	export const type: NotificationType<string[]> = new NotificationType('html/customDataChanged');
@@ -213,7 +219,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				documentSelector: null,
 				interFileDependencies: false,
 				workspaceDiagnostics: false
-			}
+			},
 		};
 		return { capabilities };
 	});
@@ -237,7 +243,45 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 				diagnosticsSupport?.requestRefresh();
 			});
 		}
+		documents.onDidChangeContent(async documentChange => {
+			await runSafe(runtime, async () => {
+
+				const document = documentChange.document;
+
+				if (documentChange.changes) {
+					for (const edit of documentChange.changes) {
+						if (TextDocumentContentChangeEvent.isIncremental(edit)) {
+							const pos: Position = { line: edit.range.start.line, character: edit.range.start.character + 1 };
+							if (pos.character > 0) {
+								const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
+								if (mode && mode.doAutoInsert) {
+									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
+									if (edit.text === '=') {
+										typ = 'autoQuote';
+									} else if (edit.text !== '>' && edit.text !== '/') {
+										continue;
+									}
+
+									const o = await mode.doAutoInsert(document, pos, typ);
+									if (typeof o !== "string") {
+										continue;
+									}
+									await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
+								}
+							}
+						}
+
+					}
+
+				}
+				return;
+
+			}, undefined, "Error while handling notification", CancellationToken.None);
+		})
+
 	});
+
+
 
 	let formatterRegistrations: Thenable<Disposable>[] | null = null;
 

@@ -63,7 +63,6 @@ export function getHTMLMode(htmlLanguageService: HTMLLanguageService, workspace:
 					const htmlSettings = settings?.html;
 					const options = merge(htmlSettings?.suggest, {});
 					options.attributeDefaultValue = htmlSettings?.completion?.attributeDefaultValue ?? 'doublequotes';
-
 					return htmlLanguageService.doQuoteComplete(document, position, htmlDocuments.get(document), options);
 				}
 			} else if (kind === 'autoClose') {
