@@ -9,8 +9,9 @@
   },
   "main": "./out/node/htmlServerMain",
   "dependencies": {
-    "core-js": "^3.37.1",
+    "@types/node": "20.x",
     "@vscode/l10n": "^0.0.18",
+    "core-js": "^3.37.1",
     "vscode-css-languageservice": "^6.2.13",
     "vscode-html-languageservice": "^5.2.0",
     "vscode-languageserver": "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes",
@@ -18,8 +19,7 @@
     "vscode-uri": "^3.0.8"
   },
   "devDependencies": {
-    "@types/mocha": "^9.1.1",
-    "@types/node": "20.x"
+    "@types/mocha": "^9.1.1"
   },
   "scripts": {
     "compile": "npx gulp compile-extension:html-language-features-server",

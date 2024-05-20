@@ -7,6 +7,11 @@
   resolved "https://registry.npmjs.org/@types/mocha/-/mocha-9.1.1.tgz"
   integrity sha512-Z61JK7DKDtdKTWwLeElSEBcWGRLY8g95ic5FoQqI9CMx0ns/Ghep3B4DfcEimiKMvtamNVULVNKEsiwV3aQmXw==
 
+"@types/node@16.11.43":
+  version "16.11.43"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.43.tgz#555e5a743f76b6b897d47f945305b618525ddbe6"
+  integrity sha512-GqWykok+3uocgfAJM8imbozrqLnPyTrpFlrryURQlw1EesPUCx5XxTiucWDSFF9/NUEXDuD4bnvHm8xfVGWTpQ==
+
 "@types/node@20.x":
   version "20.12.12"
   resolved "https://registry.npmjs.org/@types/node/-/node-20.12.12.tgz"
@@ -21,7 +26,7 @@
 
 core-js@^3.37.1:
   version "3.37.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.37.1.tgz#d21751ddb756518ac5a00e4d66499df981a62db9"
+  resolved "https://registry.npmjs.org/core-js/-/core-js-3.37.1.tgz"
   integrity sha512-Xn6qmxrQZyB0FFY8E3bgRXei3lWDJHhvI+u0q9TKIYM49G8pAr0FgnnrFRAmsbptZL1yxRADVXn+x5AGsbBfyw==
 
 undici-types@~5.26.4:
@@ -79,8 +84,9 @@ vscode-languageserver-types@3.17.6-next.3:
 
 "vscode-languageserver@https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes":
   version "10.0.0-next.3"
-  resolved "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes#b874eb3c86a774f2ba4dde712c294b59a51224bc"
+  resolved "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes#d63201299b239065f4362a71a3a8346849d06aa8"
   dependencies:
+    "@types/node" "16.11.43"
     vscode-languageserver-protocol "3.17.6-next.4"
 
 vscode-uri@^3.0.8:
