@@ -12,6 +12,7 @@
     "@types/node": "20.x",
     "@vscode/l10n": "^0.0.18",
     "core-js": "^3.37.1",
+    "typescript": "^5.4.5",
     "vscode-css-languageservice": "^6.2.13",
     "vscode-html-languageservice": "^5.2.0",
     "vscode-languageserver": "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes",
