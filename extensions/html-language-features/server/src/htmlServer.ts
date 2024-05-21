@@ -246,7 +246,6 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 		if (snippetEditSupport) {
 			documents.onDidChangeContent(async documentChange => {
 				await runSafe(runtime, async () => {
-
 					const document = documentChange.document;
 
 					if (documentChange.changes) {
@@ -255,20 +254,29 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 								const pos: Position = { line: edit.range.start.line, character: edit.range.start.character + 1 };
 								if (pos.character > 0) {
 									const mode = languageModes.getModeAtPosition(document, Position.create(pos.line, pos.character - 1));
-									if (mode && mode.doAutoInsert) {
-										let typ: 'autoClose' | 'autoQuote' = 'autoClose';
-										if (edit.text === '=') {
-											typ = 'autoQuote';
-										} else if (edit.text !== '>' && edit.text !== '/') {
-											continue;
-										}
-
-										const o = await mode.doAutoInsert(document, pos, typ);
-										if (typeof o !== "string") {
-											continue;
-										}
-										await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
+									if (!mode || !mode.doAutoInsert) {
+										continue;
 									}
+									let modeId = mode.getId();
+									if (modeId != "css" && modeId != "html" && modeId != "javascript" && modeId != "js/ts") {
+										continue;
+									}
+									if (globalSettings[modeId] && 'tagAutoclosing' in globalSettings[modeId] && globalSettings[modeId].tagAutoclosing !== true) {
+										continue;
+									}
+									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
+									if (edit.text === '=') {
+										typ = 'autoQuote';
+									} else if (edit.text !== '>' && edit.text !== '/') {
+										continue;
+									}
+
+									const o = await mode.doAutoInsert(document, pos, typ);
+									if (typeof o !== "string") {
+										continue;
+									}
+									await connection.sendRequest(ApplyWorkspaceEditRequest.type, { edit: { documentChanges: [TextDocumentEdit.create(OptionalVersionedTextDocumentIdentifier.create(document.uri, document.version), [{ snippet: StringValue.createSnippet(o), range: Range.create(pos, pos) }])] } });
+
 								}
 							}
 
