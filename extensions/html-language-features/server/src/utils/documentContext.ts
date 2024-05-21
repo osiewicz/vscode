@@ -5,7 +5,7 @@
 
 import { DocumentContext } from 'vscode-css-languageservice';
 import { endsWith, startsWith } from '../utils/strings';
-import { WorkspaceFolder } from 'vscode-languageserver';
+import { WorkspaceFolder } from '@zed-industries/vscode-languageserver';
 import { URI, Utils } from 'vscode-uri';
 
 export function getDocumentContext(documentUri: string, workspaceFolders: WorkspaceFolder[]): DocumentContext {

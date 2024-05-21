@@ -13,7 +13,7 @@ import {
 	StringValue,
 	TextDocumentContentChangeEvent,
 	CancellationToken,
-} from 'vscode-languageserver';
+} from '@zed-industries/vscode-languageserver';
 import {
 	getLanguageModes, LanguageModes, Settings, TextDocument, Position, Diagnostic, WorkspaceFolder, ColorInformation,
 	Range, DocumentLink, SymbolInformation, TextDocumentIdentifier, isCompletionItemData

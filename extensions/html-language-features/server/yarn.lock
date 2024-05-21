@@ -24,6 +24,14 @@
   resolved "https://registry.yarnpkg.com/@vscode/l10n/-/l10n-0.0.18.tgz#916d3a5e960dbab47c1c56f58a7cb5087b135c95"
   integrity sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==
 
+"@zed-industries/vscode-languageserver@10.0.0-next.3":
+  version "10.0.0-next.3"
+  resolved "https://registry.yarnpkg.com/@zed-industries/vscode-languageserver/-/vscode-languageserver-10.0.0-next.3.tgz#f24e33c5c044677d47c920342e05b4ce9b745af1"
+  integrity sha512-NFhRtELp6LcubAonzqIKlhyaPbDI++JWXlgC37Mkj1fqNhnrQdchJpfs6eX5CoboKQgFlOP1GYG1NfeA8otJOQ==
+  dependencies:
+    "@types/node" "16.11.43"
+    vscode-languageserver-protocol "3.17.6-next.4"
+
 core-js@^3.37.1:
   version "3.37.1"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.37.1.tgz#d21751ddb756518ac5a00e4d66499df981a62db9"
@@ -86,13 +94,6 @@ vscode-languageserver-types@3.17.6-next.3:
   version "3.17.6-next.3"
   resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.17.6-next.3.tgz#f71d6c57f18d921346cfe0c227aabd72eb8cd2f0"
   integrity sha512-l5kNFXFRQGuzriXpuBqFpRmkf6f6A4VoU3h95OsVkqIOoi1k7KbwSo600cIdsKSJWrPg/+vX+QMPcMw1oI7ItA==
-
-"vscode-languageserver@https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes":
-  version "10.0.0-next.3"
-  resolved "https://gitpkg.now.sh/zed-industries/vscode-languageserver-node/server?document_manager_include_changes#d63201299b239065f4362a71a3a8346849d06aa8"
-  dependencies:
-    "@types/node" "16.11.43"
-    vscode-languageserver-protocol "3.17.6-next.4"
 
 vscode-uri@^3.0.8:
   version "3.0.8"

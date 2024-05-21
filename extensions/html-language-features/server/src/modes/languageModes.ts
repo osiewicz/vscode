@@ -13,7 +13,7 @@ import {
 	Hover, Location, Position, Range, SignatureHelp, SymbolInformation, TextEdit,
 	Color, ColorInformation, ColorPresentation, WorkspaceEdit,
 	WorkspaceFolder
-} from 'vscode-languageserver';
+} from '@zed-industries/vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import { getLanguageModelCache, LanguageModelCache } from '../languageModelCache';
@@ -30,7 +30,7 @@ export {
 	Color, ColorInformation, ColorPresentation, WorkspaceEdit,
 	SignatureInformation, ParameterInformation, DiagnosticSeverity,
 	SelectionRange, TextDocumentIdentifier
-} from 'vscode-languageserver';
+} from '@zed-industries/vscode-languageserver';
 
 export { ClientCapabilities, DocumentContext, LanguageService, HTMLDocument, HTMLFormatConfiguration, TokenType } from 'vscode-html-languageservice';
 
