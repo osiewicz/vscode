@@ -261,7 +261,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 									if (modeId != "css" && modeId != "html" && modeId != "javascript" && modeId != "js/ts") {
 										continue;
 									}
-									if (globalSettings[modeId] && 'tagAutoclosing' in globalSettings[modeId] && globalSettings[modeId].tagAutoclosing !== true) {
+									if (globalSettings !== null && globalSettings !== undefined && modeId in globalSettings && 'tagAutoclosing' in globalSettings[modeId] && globalSettings[modeId].tagAutoclosing !== true) {
 										continue;
 									}
 									let typ: 'autoClose' | 'autoQuote' = 'autoClose';
